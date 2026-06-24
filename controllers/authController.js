@@ -1,5 +1,5 @@
 
-const service=require('../services/authService')
+const authService=require('../services/authService')
  
 // inscription
 const inscription=async(req,res)=>{
