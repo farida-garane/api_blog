@@ -1,11 +1,15 @@
+const express = require('express');
+const router = express.Router();
+const commentController = require('../controllers/commentController');
+const authMiddleware = require('../middleware/authmiddleware');
 
-const express=require('express');
-const router= express.Router();
-const controller=require('../controllers/commentController');
-const middleware=require('../middleware/authmiddleware');
+// POST /api/comments - Créer un commentaire (protégé)
+router.post('/', authMiddleware, commentController.createComment);
 
-router.get('/:id',authmiddleware.getComment);
-router.put('/:id',authmiddleware.updateComment);
-router.delete('/:id',authmiddleware.deleteComment);
+// GET /api/comments/:postId - Récupérer les commentaires d'un article
+router.get('/:postId', commentController.getCommentsByPostId);
 
-module.exports=router;
+// DELETE /api/comments/:id - Supprimer un commentaire (protégé)
+router.delete('/:id', authMiddleware, commentController.deleteComment);
+
+module.exports = router;

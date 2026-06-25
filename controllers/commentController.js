@@ -1,53 +1,44 @@
+const commentService = require('../services/commentService');
 
-const commentService=require('../services/commentService');
+// Créer un commentaire
+const createComment = async (req, res) => {
+  try {
+    const { postId, content } = req.body;
+    const userId = req.user.id;
 
-// creer un commentaire
-const createComment=async(req,res)=>{
-    try{
-
-         const{postID, content}=req.body;
-        
-         const userID=req.user.id;
-        if(!postID||!content){
-            res.status(400).json({message:"titre et contenu requis"});
-        }
-         const comment=await commentService.createComment(postID,content);
-         res.status(201).json({message:"commentaure cree",comment});
-
-    }catch(err){
-        console.error("erreur:",err)
-        res.status(500).json({error:"erreur intervenue veuillez ressayer plutard"});
-
+    if (!postId || !content) {
+      return res.status(400).json({ error: 'PostID et contenu requis' });
     }
 
-}
+    const comment = await commentService.createComment(postId, userId, content);
+    res.status(201).json({ message: 'Commentaire créé', comment });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};
 
 // Récupérer les commentaires d'un article
-const getCommentByPostId=async(req,res)=>{
-    try{
+const getCommentsByPostId = async (req, res) => {
+  try {
+    const { postId } = req.params;
+    const comments = await commentService.getCommentsByPostId(postId);
+    res.json(comments);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};
 
-          const{postID}=req.params;
-          const comment=await commentService.getCommentByPostId(postID);
-         res.json(comment);
-    }catch(err){
-        console.error("erreur:",err)
-        res.status(500).json({error:"erreur intervenue veuillez ressayer plutard"});
+// Supprimer un commentaire
+const deleteComment = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const userId = req.user.id;
 
-    }
+    await commentService.deleteComment(id, userId);
+    res.json({ message: 'Commentaire supprimé' });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};
 
-}
-
-// supprimer les commentaire d'un article
-const deleteCommentByPostId=async(req,res)=>{
-     try{
-        const{postID}=req.params;
-        const comment=await commentService.deleteCommentByPostId(postID);
-        res.jsom({message:"commentaire supprime"});
-
-     }catch(err){
-         console.error("erreur:",err)
-        res.status(500).json({error:"erreur intervenue veuillez ressayer plutard"});
-     }
-}
-
-module.exports={ createComment,getCommentByPostId, deleteCommentByPostId};
+module.exports = { createComment, getCommentsByPostId, deleteComment };
